@@ -1,8 +1,8 @@
 const PetPage = () => {
   return (
-    <div className="w-full h-full primary text-white flex flex-col justify-center items-center !p-5  select-none">
+    <div className="w-full h-full text-white flex flex-col justify-center items-center !p-5  select-none">
       <div>
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center !mt-20">
           <img
             src="/images/sitting.png"
             alt="sitting_pet"
@@ -25,18 +25,18 @@ const PetPage = () => {
             </div>
           </div>
 
-          <div className="!p-5 !pt-10 flex flex-col items-center w-full gap-5 ">
-            <div className="w-full h-10 flex justify-between gap-5">
-              <span>Happiness</span>
-              <div className="rounded-full bg-green-500 h-8 w-50"></div>
+          <div className="!py-5 !px-5 !my-5 flex flex-col items-center w-full gap-5 rounded-2xl secondary">
+            <div className="w-full flex flex-col gap-2">
+              <div>Happiness</div>
+              <div className="rounded-full bg-green-800 h-8 w-full"></div>
             </div>
-            <div className="w-full h-10 flex justify-between gap-5">
+            <div className="w-full flex flex-col gap-2">
               <span>Hungry</span>
-              <div className="rounded-full bg-green-500 h-8 w-50"></div>
+              <div className="rounded-full bg-green-800 h-8 w-full"></div>
             </div>
-            <div className="w-full h-10 flex justify-between gap-5">
+            <div className="w-full flex flex-col gap-2">
               <span>Energy</span>
-              <div className="rounded-full bg-green-500 h-8 w-50"></div>
+              <div className="rounded-full bg-green-800 h-8 w-full"></div>
             </div>
           </div>
         </div>
