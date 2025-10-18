@@ -23,7 +23,30 @@ const PetPage = () => {
       }, 5000);
     }
 
-    if(state === "idle") {
+    if (state === "sleeping") {
+      let eatingFrame = 1;
+      interval = setInterval(() => {
+        eatingFrame = (eatingFrame % 2) + 1;
+        setImageSrc(`/images/sleeping${eatingFrame}.png`);
+      }, 300);
+
+      timeout = setTimeout(() => {
+        setState("idle");
+      }, 7000);
+    }
+    if (state === "walking") {
+      let eatingFrame = 1;
+      interval = setInterval(() => {
+        eatingFrame = (eatingFrame % 2) + 1;
+        setImageSrc(`/images/walk${eatingFrame}.png`);
+      }, 300);
+
+      timeout = setTimeout(() => {
+        setState("idle");
+      }, 12000);
+    }
+
+    if (state === "idle") {
       setImageSrc("/images/sitting.png");
     }
 
@@ -60,7 +83,7 @@ const PetPage = () => {
               className="rounded-full secondary !p-2 max-h-20 max-w-20 flex justify-center items-center cursor-pointer"
               onClick={() => {
                 setImageSrc(() => {
-                  return "/images/sleeping.png";
+                  return "/images/sleeping1.png";
                 });
                 setState("sleeping");
               }}
@@ -82,7 +105,7 @@ const PetPage = () => {
               className="rounded-full secondary !p-2 max-h-20 max-w-20 flex justify-center items-center cursor-pointer"
               onClick={() => {
                 setImageSrc(() => {
-                  return "/images/walk.png";
+                  return "/images/walk1.png";
                 });
                 setState("walking");
               }}
