@@ -1,7 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+type PetState = "idle" | "sleeping" | "eating" | "walking";
 
 const PetPage = () => {
   const [imageSrc, setImageSrc] = useState("/images/sitting.png");
+  const [state, setState] = useState<PetState>("idle");
+
+  useEffect(() => {
+    console.log("State changed to:", state);
+    let interval: ReturnType<typeof setInterval>;
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (state === "eating") {
+      let eatingFrame = 1;
+      interval = setInterval(() => {
+        eatingFrame = (eatingFrame % 2) + 1;
+        setImageSrc(`/images/eating${eatingFrame}.png`);
+      }, 300);
+
+      timeout = setTimeout(() => {
+        setState("idle");
+      }, 5000);
+    }
+
+    if(state === "idle") {
+      setImageSrc("/images/sitting.png");
+    }
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [state]);
 
   return (
     <div className="w-full h-full text-white flex flex-col justify-center items-center !p-5  select-none">
@@ -21,6 +51,7 @@ const PetPage = () => {
                 setImageSrc(() => {
                   return "/images/sitting.png";
                 });
+                setState("idle");
               }}
             >
               <img src="/images/sunicon.png" alt="sun_icon" />
@@ -31,6 +62,7 @@ const PetPage = () => {
                 setImageSrc(() => {
                   return "/images/sleeping.png";
                 });
+                setState("sleeping");
               }}
             >
               <img src="/images/moonicon.png" alt="moon_icon" />
@@ -41,6 +73,7 @@ const PetPage = () => {
                 setImageSrc(() => {
                   return "/images/eating1.png";
                 });
+                setState("eating");
               }}
             >
               <img src="/images/foodicon.png" alt="food_icon" />
@@ -51,6 +84,7 @@ const PetPage = () => {
                 setImageSrc(() => {
                   return "/images/walk.png";
                 });
+                setState("walking");
               }}
             >
               <img src="/images/walkingicon.png" alt="walking_icon" />
