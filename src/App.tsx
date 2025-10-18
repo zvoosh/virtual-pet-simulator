@@ -4,7 +4,7 @@ import { PetPage } from "./pages";
 
 function App() {
   return (
-    <div className="w-screen h-screen flex flex-col itim-regular primary">
+    <div className="w-screen h-screen flex flex-col caveat-brush-regular primary">
       <Header />
       <main className="flex-1 overflow-y-auto">
         <PetPage />
