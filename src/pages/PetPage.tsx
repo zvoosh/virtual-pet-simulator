@@ -22,37 +22,38 @@ const PetPage = () => {
   const [state, setState] = useState<PetState>("idle");
   const [status, setStatus] = useState<PetStatus>(initialStatus);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("petStatus");
-
-    if (saved) {
-      const {
-        happiness,
-        hunger,
-        energy,
-        timestamp,
-      }: PetStatus & { timestamp: number } = JSON.parse(saved);
-      const minutesPassed = (Date.now() - timestamp) / MS_PER_MINUTE;
-
-      const decayedStatus: PetStatus = {
+  const initializeCountdown = () => {
+    const savedStatus = localStorage.getItem("petStatus");
+    if (savedStatus) {
+      const parsedStatus = JSON.parse(savedStatus);
+      const timeElapsed = Date.now() - parsedStatus.timestamp;
+      const decayAmount = (DECAY_RATE_PER_MINUTE * timeElapsed) / MS_PER_MINUTE;
+      setStatus({
         happiness: Math.floor(
-          Math.max(happiness - minutesPassed * DECAY_RATE_PER_MINUTE, 0)
+          Math.max(parsedStatus.happiness - decayAmount, 0)
         ),
-        hunger: Math.floor(
-          Math.max(hunger - minutesPassed * DECAY_RATE_PER_MINUTE, 0)
-        ),
-        energy: Math.floor(
-          Math.max(energy - minutesPassed * DECAY_RATE_PER_MINUTE, 0)
-        ),
-      };
-
-      setStatus(decayedStatus);
+        hunger: Math.floor(Math.max(parsedStatus.hunger - decayAmount, 0)),
+        energy: Math.floor(Math.max(parsedStatus.energy - decayAmount, 0)),
+      });
     } else {
-      localStorage.setItem(
-        "petStatus",
-        JSON.stringify({ ...initialStatus, timestamp: Date.now() })
-      );
+      setStatus(initialStatus);
     }
+  };
+
+  useEffect(() => {
+    initializeCountdown();
+
+    const interval = setInterval(() => {
+      setStatus((prev) => ({
+        happiness: Math.floor(
+          Math.max(prev.happiness - DECAY_RATE_PER_MINUTE, 0)
+        ),
+        hunger: Math.floor(Math.max(prev.hunger - DECAY_RATE_PER_MINUTE, 0)),
+        energy: Math.floor(Math.max(prev.energy - DECAY_RATE_PER_MINUTE, 0)),
+      }));
+    }, MS_PER_MINUTE);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -61,23 +62,23 @@ const PetPage = () => {
       JSON.stringify({ ...status, timestamp: Date.now() })
     );
   }, [status]);
-
   useEffect(() => {
     console.log("State changed to:", state);
-    let interval: ReturnType<typeof setInterval>;
-    let timeout: ReturnType<typeof setTimeout>;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
 
     if (state === "eating") {
-      let eatingFrame = 1;
+      let frame = 1;
       interval = setInterval(() => {
-        eatingFrame = (eatingFrame % 2) + 1;
-        setImageSrc(`/images/eating${eatingFrame}.png`);
+        frame = (frame % 2) + 1;
+        setImageSrc(`/images/eating${frame}.png`);
         setStatus((prev) => ({
           ...prev,
-          hunger: Math.min(prev.hunger + 16, 100),
-          happiness: Math.min(prev.happiness + 7, 100),
+          energy: Math.max(prev.energy - 0.3, 0),
+          hunger: Math.min(prev.hunger + 1.2, 100),
+          happiness: Math.min(prev.happiness + 0.4, 100),
         }));
-      }, 300);
+      }, 500);
 
       timeout = setTimeout(() => {
         setState("idle");
@@ -85,26 +86,38 @@ const PetPage = () => {
     }
 
     if (state === "sleeping") {
-      let eatingFrame = 1;
+      let frame = 1;
       interval = setInterval(() => {
-        eatingFrame = (eatingFrame % 2) + 1;
-        setImageSrc(`/images/sleeping${eatingFrame}.png`);
-      }, 200);
+        frame = (frame % 2) + 1;
+        setImageSrc(`/images/sleeping${frame}.png`);
+        setStatus((prev) => ({
+          ...prev,
+          energy: Math.min(prev.energy + 1, 100),
+          happiness: Math.min(prev.happiness + 0.3, 100),
+        }));
+      }, 500);
 
       timeout = setTimeout(() => {
         setState("idle");
-      }, 7000);
+      }, 5000);
     }
+
     if (state === "walking") {
-      let eatingFrame = 1;
+      let frame = 1;
       interval = setInterval(() => {
-        eatingFrame = (eatingFrame % 2) + 1;
-        setImageSrc(`/images/walk${eatingFrame}.png`);
-      }, 300);
+        frame = (frame % 2) + 1;
+        setImageSrc(`/images/walk${frame}.png`);
+        setStatus((prev) => ({
+          ...prev,
+          hunger: Math.max(prev.hunger - 0.5, 0),
+          energy: Math.max(prev.energy - 0.5, 0),
+          happiness: Math.min(prev.happiness + 0.6, 100),
+        }));
+      }, 500);
 
       timeout = setTimeout(() => {
         setState("idle");
-      }, 12000);
+      }, 4000);
     }
 
     if (state === "idle") {
@@ -112,8 +125,8 @@ const PetPage = () => {
     }
 
     return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+      if (timeout) clearTimeout(timeout);
     };
   }, [state]);
 
@@ -132,9 +145,6 @@ const PetPage = () => {
             <button
               className="rounded-full secondary !p-2 max-h-20 max-w-20 flex justify-center items-center cursor-pointer"
               onClick={() => {
-                setImageSrc(() => {
-                  return "/images/sitting.png";
-                });
                 setState("idle");
               }}
             >
@@ -143,9 +153,6 @@ const PetPage = () => {
             <button
               className="rounded-full secondary !p-2 max-h-20 max-w-20 flex justify-center items-center cursor-pointer"
               onClick={() => {
-                setImageSrc(() => {
-                  return "/images/sleeping1.png";
-                });
                 setState("sleeping");
               }}
             >
@@ -155,9 +162,6 @@ const PetPage = () => {
               className="rounded-full secondary !p-2 max-h-20 max-w-20 flex justify-center items-center cursor-pointer"
               onClick={() => {
                 setState("eating");
-                setImageSrc(() => {
-                  return "/images/eating1.png";
-                });
               }}
             >
               <img src="/images/foodicon.png" alt="food_icon" />
@@ -165,9 +169,6 @@ const PetPage = () => {
             <button
               className="rounded-full secondary !p-2 max-h-20 max-w-20 flex justify-center items-center cursor-pointer"
               onClick={() => {
-                setImageSrc(() => {
-                  return "/images/walk1.png";
-                });
                 setState("walking");
               }}
             >
@@ -177,24 +178,42 @@ const PetPage = () => {
 
           <div className="!py-5 !px-5 !my-5 flex flex-col items-center w-full gap-5 rounded-2xl secondary">
             <div className="w-full flex flex-col gap-2">
-              <div>Happiness</div>
+              <div>
+                Happiness
+                <span className="!mx-2">{Math.floor(status.happiness)}%</span>
+              </div>
               <div
-                className="rounded-full bg-green-800 h-8"
-                style={{ width: `${status.happiness}%` }}
+                className="rounded-full bg-green-800 h-3"
+                style={{
+                  width: `${Math.floor(status.happiness)}%`,
+                  minWidth: "20px",
+                }}
               ></div>
             </div>
             <div className="w-full flex flex-col gap-2">
-              <span>Hungry</span>
+              <span>
+                Hungry
+                <span className="!mx-2">{Math.floor(status.hunger)}%</span>
+              </span>
               <div
-                className="rounded-full bg-green-800 h-8"
-                style={{ width: `${status.hunger}%` }}
+                className="rounded-full bg-green-800 h-3"
+                style={{
+                  width: `${Math.floor(status.hunger)}%`,
+                  minWidth: "20px",
+                }}
               ></div>
             </div>
             <div className="w-full flex flex-col gap-2">
-              <span>Energy</span>
+              <span>
+                Energy
+                <span className="!mx-2">{Math.floor(status.energy)}%</span>
+              </span>
               <div
-                className="rounded-full bg-green-800 h-8"
-                style={{ width: `${status.energy}%` }}
+                className="rounded-full bg-green-800 h-3"
+                style={{
+                  width: `${Math.floor(status.energy)}%`,
+                  minWidth: "20px",
+                }}
               ></div>
             </div>
           </div>
