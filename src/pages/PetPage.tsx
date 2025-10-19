@@ -2,9 +2,60 @@ import { useEffect, useState } from "react";
 
 type PetState = "idle" | "sleeping" | "eating" | "walking";
 
+type PetStatus = {
+  happiness: number;
+  hunger: number;
+  energy: number;
+};
+
+const initialStatus: PetStatus = {
+  happiness: 100,
+  hunger: 100,
+  energy: 100,
+};
+
+const DECAY_RATE_PER_MINUTE = 100 / 720; // 100 points over 12 hours in minutes
+const MS_PER_MINUTE = 1000 * 60;
+
+
 const PetPage = () => {
-  const [imageSrc, setImageSrc] = useState("/images/sitting.png");
+  const [imageSrc, setImageSrc] = useState<string>("/images/sitting.png");
   const [state, setState] = useState<PetState>("idle");
+  const [status, setStatus] = useState<PetStatus>(initialStatus);
+
+  useEffect(() => {
+    const petStatus = localStorage.getItem("petStatus");
+    if (petStatus) {
+      const {
+        happiness,
+        hunger,
+        energy,
+        timestamp,
+      }: PetStatus & { timestamp: number } = JSON.parse(petStatus);
+      const minutesPassed = (Date.now() - timestamp) / MS_PER_MINUTE;
+
+      const decayedStatus: PetStatus = {
+        happiness: Math.floor(
+          Math.max(happiness - minutesPassed * DECAY_RATE_PER_MINUTE, 0)
+        ),
+        hunger: Math.floor(
+          Math.max(hunger - minutesPassed * DECAY_RATE_PER_MINUTE, 0)
+        ),
+        energy: Math.floor(
+          Math.max(energy - minutesPassed * DECAY_RATE_PER_MINUTE, 0)
+        ),
+      };
+
+      setStatus(decayedStatus);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "petStatus",
+      JSON.stringify({ ...status, timestamp: Date.now() })
+    );
+  }, [status]);
 
   useEffect(() => {
     console.log("State changed to:", state);
@@ -16,6 +67,11 @@ const PetPage = () => {
       interval = setInterval(() => {
         eatingFrame = (eatingFrame % 2) + 1;
         setImageSrc(`/images/eating${eatingFrame}.png`);
+        setStatus((prev) => ({
+          ...prev,
+          hunger: Math.min(prev.hunger + 16, 100),
+          happiness: Math.min(prev.happiness + 7, 100),
+        }));
       }, 300);
 
       timeout = setTimeout(() => {
@@ -28,7 +84,7 @@ const PetPage = () => {
       interval = setInterval(() => {
         eatingFrame = (eatingFrame % 2) + 1;
         setImageSrc(`/images/sleeping${eatingFrame}.png`);
-      }, 300);
+      }, 200);
 
       timeout = setTimeout(() => {
         setState("idle");
@@ -93,10 +149,10 @@ const PetPage = () => {
             <button
               className="rounded-full secondary !p-2 max-h-20 max-w-20 flex justify-center items-center cursor-pointer"
               onClick={() => {
+                setState("eating");
                 setImageSrc(() => {
                   return "/images/eating1.png";
                 });
-                setState("eating");
               }}
             >
               <img src="/images/foodicon.png" alt="food_icon" />
@@ -117,15 +173,24 @@ const PetPage = () => {
           <div className="!py-5 !px-5 !my-5 flex flex-col items-center w-full gap-5 rounded-2xl secondary">
             <div className="w-full flex flex-col gap-2">
               <div>Happiness</div>
-              <div className="rounded-full bg-green-800 h-8 w-full"></div>
+              <div
+                className="rounded-full bg-green-800 h-8"
+                style={{ width: `${status.happiness}%` }}
+              ></div>
             </div>
             <div className="w-full flex flex-col gap-2">
               <span>Hungry</span>
-              <div className="rounded-full bg-green-800 h-8 w-full"></div>
+              <div
+                className="rounded-full bg-green-800 h-8"
+                style={{ width: `${status.hunger}%` }}
+              ></div>
             </div>
             <div className="w-full flex flex-col gap-2">
               <span>Energy</span>
-              <div className="rounded-full bg-green-800 h-8 w-full"></div>
+              <div
+                className="rounded-full bg-green-800 h-8"
+                style={{ width: `${status.energy}%` }}
+              ></div>
             </div>
           </div>
         </div>
