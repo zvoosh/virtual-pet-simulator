@@ -19,7 +19,7 @@ const MS_PER_MINUTE = 1000 * 60;
 
 const PetPage = () => {
   const [imageSrc, setImageSrc] = useState<string>("/images/sitting.png");
-  const [state, setState] = useState<PetState>("idle");
+  const [state, setState] = useState<PetState>(localStorage.getItem("petState") ? (JSON.parse(localStorage.getItem("petState") as string).state as PetState) : "idle");
   const [status, setStatus] = useState<PetStatus>(initialStatus);
 
   const initializeCountdown = () => {
@@ -62,6 +62,14 @@ const PetPage = () => {
       JSON.stringify({ ...status, timestamp: Date.now() })
     );
   }, [status]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "petState",
+      JSON.stringify({ state, timestamp: Date.now() })
+    );
+  }, [state]);
+
   useEffect(() => {
     console.log("State changed to:", state);
     let interval: ReturnType<typeof setInterval> | undefined;
