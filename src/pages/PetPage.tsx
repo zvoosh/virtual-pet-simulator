@@ -14,7 +14,7 @@ const initialStatus: PetStatus = {
   energy: 100,
 };
 
-const DECAY_RATE_PER_MINUTE = 100 / 720; // 100 points over 12 hours in minutes
+const DECAY_RATE_PER_MINUTE = 100 / 86400; // 100 points over 12 hours in minutes
 const MS_PER_MINUTE = 1000 * 60;
 
 const PetPage = () => {
@@ -74,7 +74,6 @@ const PetPage = () => {
         setImageSrc(`/images/eating${frame}.png`);
         setStatus((prev) => ({
           ...prev,
-          energy: Math.max(prev.energy - 0.3, 0),
           hunger: Math.min(prev.hunger + 1.2, 100),
           happiness: Math.min(prev.happiness + 0.4, 100),
         }));
@@ -92,14 +91,11 @@ const PetPage = () => {
         setImageSrc(`/images/sleeping${frame}.png`);
         setStatus((prev) => ({
           ...prev,
+          hunger: Math.max(prev.hunger - 100 / 172800, 0), // 24h decay
           energy: Math.min(prev.energy + 1, 100),
           happiness: Math.min(prev.happiness + 0.3, 100),
         }));
       }, 500);
-
-      timeout = setTimeout(() => {
-        setState("idle");
-      }, 5000);
     }
 
     if (state === "walking") {
@@ -109,8 +105,6 @@ const PetPage = () => {
         setImageSrc(`/images/walk${frame}.png`);
         setStatus((prev) => ({
           ...prev,
-          hunger: Math.max(prev.hunger - 0.5, 0),
-          energy: Math.max(prev.energy - 0.5, 0),
           happiness: Math.min(prev.happiness + 0.6, 100),
         }));
       }, 500);
@@ -180,7 +174,9 @@ const PetPage = () => {
             <div className="w-full flex flex-col gap-2">
               <div>
                 Happiness
-                <span className="!mx-2">{Math.floor(status.happiness)}%</span>
+                <span className="!mx-2">
+                  {Math.floor(Math.max(status.happiness))}%
+                </span>
               </div>
               <div
                 className="rounded-full bg-green-800 h-3"
@@ -193,7 +189,9 @@ const PetPage = () => {
             <div className="w-full flex flex-col gap-2">
               <span>
                 Hungry
-                <span className="!mx-2">{Math.floor(status.hunger)}%</span>
+                <span className="!mx-2">
+                  {Math.floor(Math.max(status.hunger))}%
+                </span>
               </span>
               <div
                 className="rounded-full bg-green-800 h-3"
@@ -206,7 +204,9 @@ const PetPage = () => {
             <div className="w-full flex flex-col gap-2">
               <span>
                 Energy
-                <span className="!mx-2">{Math.floor(status.energy)}%</span>
+                <span className="!mx-2">
+                  {Math.floor(Math.max(status.energy))}%
+                </span>
               </span>
               <div
                 className="rounded-full bg-green-800 h-3"
