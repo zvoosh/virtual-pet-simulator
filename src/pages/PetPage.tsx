@@ -17,21 +17,21 @@ const initialStatus: PetStatus = {
 const DECAY_RATE_PER_MINUTE = 100 / 720; // 100 points over 12 hours in minutes
 const MS_PER_MINUTE = 1000 * 60;
 
-
 const PetPage = () => {
   const [imageSrc, setImageSrc] = useState<string>("/images/sitting.png");
   const [state, setState] = useState<PetState>("idle");
   const [status, setStatus] = useState<PetStatus>(initialStatus);
 
   useEffect(() => {
-    const petStatus = localStorage.getItem("petStatus");
-    if (petStatus) {
+    const saved = localStorage.getItem("petStatus");
+
+    if (saved) {
       const {
         happiness,
         hunger,
         energy,
         timestamp,
-      }: PetStatus & { timestamp: number } = JSON.parse(petStatus);
+      }: PetStatus & { timestamp: number } = JSON.parse(saved);
       const minutesPassed = (Date.now() - timestamp) / MS_PER_MINUTE;
 
       const decayedStatus: PetStatus = {
@@ -47,6 +47,11 @@ const PetPage = () => {
       };
 
       setStatus(decayedStatus);
+    } else {
+      localStorage.setItem(
+        "petStatus",
+        JSON.stringify({ ...initialStatus, timestamp: Date.now() })
+      );
     }
   }, []);
 
