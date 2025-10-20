@@ -66,7 +66,12 @@ const PetPage = () => {
       "petStatus",
       JSON.stringify({ ...status, timestamp: Date.now() })
     );
-    if (status.hunger <= 60 || status.energy <= 60 || status.happiness <= 60) {
+    if (
+      (status.hunger <= 60 || status.energy <= 60 || status.happiness <= 60) &&
+      state !== "eating" &&
+      state !== "sleeping" &&
+      state !== "walking"
+    ) {
       setState("sad");
       setImageSrc("/images/sad.png");
     }
