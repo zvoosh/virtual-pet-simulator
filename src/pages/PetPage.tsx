@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type PetState = "idle" | "sleeping" | "eating" | "walking";
+type PetState = "idle" | "sleeping" | "eating" | "walking" | "sad";
 
 type PetStatus = {
   happiness: number;
@@ -14,12 +14,17 @@ const initialStatus: PetStatus = {
   energy: 100,
 };
 
-const DECAY_RATE_PER_MINUTE = 100 / 86400; // 100 points over 12 hours in minutes
+const DECAY_RATE_PER_MINUTE = 100 / 2880; // 100% over 48 hours
 const MS_PER_MINUTE = 1000 * 60;
 
 const PetPage = () => {
   const [imageSrc, setImageSrc] = useState<string>("/images/sitting.png");
-  const [state, setState] = useState<PetState>(localStorage.getItem("petState") ? (JSON.parse(localStorage.getItem("petState") as string).state as PetState) : "idle");
+  const [state, setState] = useState<PetState>(
+    localStorage.getItem("petState")
+      ? (JSON.parse(localStorage.getItem("petState") as string)
+          .state as PetState)
+      : "idle"
+  );
   const [status, setStatus] = useState<PetStatus>(initialStatus);
 
   const initializeCountdown = () => {
@@ -61,6 +66,10 @@ const PetPage = () => {
       "petStatus",
       JSON.stringify({ ...status, timestamp: Date.now() })
     );
+    if (status.hunger <= 60 || status.energy <= 60 || status.happiness <= 60) {
+      setState("sad");
+      setImageSrc("/images/sad.png");
+    }
   }, [status]);
 
   useEffect(() => {
@@ -82,7 +91,7 @@ const PetPage = () => {
         setImageSrc(`/images/eating${frame}.png`);
         setStatus((prev) => ({
           ...prev,
-          hunger: Math.min(prev.hunger + 1.2, 100),
+          hunger: Math.min(prev.hunger + 2.4, 100),
           happiness: Math.min(prev.happiness + 0.4, 100),
         }));
       }, 500);
