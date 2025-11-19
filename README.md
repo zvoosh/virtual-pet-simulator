@@ -1,73 +1,84 @@
-# React + TypeScript + Vite
+# Virtual Pet Simulator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fun and engaging **virtual pet simulator** built with **React** and **TypeScript**. Raise, feed, play with, and care for your digital pet in a responsive, interactive web app.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Table of Contents
 
-## React Compiler
+- [Features](#features)  
+- [Demo / Screenshots](#demo--screenshots)  
+- [Tech Stack](#tech-stack)  
+- [Getting Started](#getting-started)  
+  - [Prerequisites](#prerequisites)  
+  - [Installation](#installation)  
+  - [Running Locally](#running-locally)  
+  - [Building for Production](#building-for-production)
+- [Deployment](#deployment)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Pet Lifecycle**: Your pet evolves or changes based on care (feeding, sleeping, playing)  
+- **Stat Tracking**: Monitor key attributes such as hunger, mood, energy, health  
+- **Interactions**: Feed the pet, walk with the pet, make it sleep or wake it
+- **Responsive UI**: Works well on desktop and mobile  
+- **Animations & Visual Feedback**: Visual cues and animations when interacting  
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Demo / Screenshots
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Idle  
+![Idle](./public/screenshots/idle.png)
+
+### Feeding
+![Feeding](./public/screenshots/eating.png)
+
+### Sleeping
+![Sleeping](./public/screenshots/sleeping.png)
+
+### Walking
+![Walking](./public/screenshots/walking.png)
+
+---
+
+## Tech Stack
+
+- **Framework**: React  
+- **Language**: TypeScript  
+- **Build Tool**: Vite  
+- **State Management**: React State
+- **Styling**: Tailwind  
+- **Storage / Persistence**: Local Storage / IndexedDB / Backend API (if any)  
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (≥ 14.x recommended)  
+- npm or Yarn  
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/zvoosh/virtual-pet-simulator.git
+
+# Navigate to the project folder
+cd virtual-pet-simulator
+
+# Install dependencies
+npm install
+# or
+yarn install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Deployment
+The project is hosted on Hostinger and can be viewed on domain: https://mypetlite.dusanprogram.eu
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+Built with ❤️ by zvoosh.
